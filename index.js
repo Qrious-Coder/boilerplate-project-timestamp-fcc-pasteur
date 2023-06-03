@@ -18,25 +18,22 @@ app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
 
-//Timestamp Microservice
+// Timestamp Microservice
 app.get("/api/:date?", function (req, res) {
   let date;
   if (!req.params.date) {
-    //No params, get current date
+    // No params, get current date
     date = new Date();
+  } else if (/^\d+$/.test(req.params.date)) {
+    // The parameter is a Unix timestamp
+    date = new Date(parseInt(req.params.date));
   } else {
-    // Turn params into Unix interger
-    let unixTimestamp = parseInt(req.params.date);
-    // date validity
-    if (!isNaN(unixTimestamp) && unixTimestamp > 0) {
-      date = new Date(unixTimestamp * 1000); //turn into miliseconds
-    } else {
-      //if invalid, parse it as string
-      date = new Date(req.params.date);
-    }
+    // The parameter is a date string
+    date = new Date(req.params.date);
   }
+
   if (isNaN(date.getTime())) {
-    res.json({ error: `Invalid Date` });
+    res.json({ error: 'Invalid Date' });
   } else {
     res.json({ unix: date.getTime(), utc: date.toUTCString() });
   }
